@@ -4,7 +4,12 @@ Vue.component('ucb-howto', {
     props: {
         dataurl: ''
     },
-    template: '<div><div v-for="howto in posts">\n' +
+    template: '<div class="ucb-component">\n' +
+        '   <div class="ucb-error-check" v-if="error">\n' +
+        '       <h4 class=ucb-vue-error>{{ error }} </h4>\n' +
+        '   </div>\n'  +
+        '   <div class="ucb-vue-component" v-else>\n' +
+        '    <div v-for="howto in posts">\n' +
         '    <div class="ucb-how-to ucb-panel" v-show="howto.attributes.title">\n' +
         '        <div class="ucb-howto-title" v-html="howto.attributes.title"></div>\n' +
         '        <div class="ucb-howto-description" v-html="howto.attributes.body.value"></div>\n' +
@@ -15,7 +20,7 @@ Vue.component('ucb-howto', {
         '\n' +
         '        <div class="ucb-howto-contact">Need additional assistance : <a :href="`mailto:${howto.attributes.field_ucb_howto_contact}`" >{{ howto.attributes.field_ucb_howto_contact }}</a></div>\n' +
         '    </div>\n' +
-        '    </div></div>',
+        '    </div></div></div>',
     data: function() {
         return {
             error: '',
@@ -27,7 +32,11 @@ Vue.component('ucb-howto', {
         let jsonURL = self.dataurl;
         if(jsonURL !== '') {
             $.getJSON(jsonURL, function (data) {
-                self.posts = data.data;
+                if(data.data) {
+                    self.posts = data.data;
+                }
+            }).fail(function () {
+                self.error = "Unable to pare JSON data from specified URL (" + jsonURL + ")";
             });
         }else {
             self.error = 'Data URL not defined, please check your configuration and retry your request.';
